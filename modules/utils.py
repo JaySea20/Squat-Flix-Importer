@@ -37,11 +37,9 @@ VERSION = "0.5.0-beta"
 #   IMPORTS
 # ===========================================================================================
 
-import sys
-import argparse
-import logging
-import json
-import os
+import sys, argparse, json, os, time
+from web.logger import setup_logger
+
 
 sys.dont_write_bytecode = True
 
@@ -61,7 +59,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SCRIPT_PATH = os.path.join(SCRIPT_DIR, "squat_flix_importer.py")
 
 # Config path: env override or default to script-relative
-CONFIG_PATH = os.getenv("SQUATFLIX_CONFIG", os.path.join(SCRIPT_DIR, "config.json"))
+CONFIG_PATH = os.getenv("SQUATFLIX_CONFIG", os.path.join(SCRIPT_DIR, "json", "config.json"))
 
 # Log path: env override or default to script-relative
 LOG_PATH = os.getenv("SQUATFLIX_LOG", os.path.join(SCRIPT_DIR, "logs", "squatflix.log"))
@@ -101,6 +99,13 @@ def parse_args():
         help="Set logging verbosity level"
     )
 
+    parser.add_argument(
+        "--logpath",
+        type=str,
+        default=None,
+        help="Path can be relative or absolute. Example /home/me/logs or ./../../logs"
+    )
+
     return parser.parse_args()
 
 # -------------------------------------------------------- CLI ARGUMENT PARSER
@@ -112,43 +117,7 @@ def parse_args():
 # ===========================================================================================
 
 
-class LogColors:
-    RESET   = "\033[0m"    # Reset to default terminal color
-    DEBUG   = "\033[36m"   # Cyan
-    INFO    = "\033[32m"   # Green
-    WARNING = "\033[33m"   # Yellow
-    ERROR   = "\033[31m"   # Red
 
-class ColorFormatter(logging.Formatter):
-    def format(self, record):
-        color = getattr(LogColors, record.levelname, LogColors.RESET)
-        message = super().format(record)
-        return f"{color}{message}{LogColors.RESET}"
-
-def setup_logger(level="INFO"):
-    log_path = LOG_PATH
-
-    logger = logging.getLogger("SquatFlix")
-    logger.setLevel(getattr(logging, level.upper(), logging.INFO))
-
-    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s")
-    color_formatter = ColorFormatter("[%(asctime)s] [%(levelname)s] %(message)s")
-
-    # Console handler with color
-    ch = logging.StreamHandler()
-    ch.setFormatter(color_formatter)
-    logger.addHandler(ch)
-
-    # File handler without color
-    fh = logging.FileHandler(log_path)
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
-
-    return logger
-
-
-# ----------------------------------------------------------------------- LOGGER SETUP
-# ===========================================================================================
 
 
 
@@ -218,7 +187,6 @@ def validate_config(config, logger=None):
 #     TASK LIFECYCLE WRAPPER
 # ===========================================================================================
 
-import time
 
 def run_task(label, func, *args, logger=None, **kwargs):
     if logger:
@@ -305,16 +273,9 @@ def process_radarr(config, logger):
 # ---------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------
 
-# Required Modules
-# - time
-
-def ensure_log_dir():
-    os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
-
 def main():
     args = parse_args()
-    ensure_log_dir()
-    logger = setup_logger(args.loglevel)
+    logger = setup_logger(level="DEBUG",log_path=LOG_PATH)
 
     logger.info(f"Squat-Flix-Importer started (v{VERSION})")
     logger.info(f"Mode selected: {'Interactive' if args.interactive else 'Autonomous'}")

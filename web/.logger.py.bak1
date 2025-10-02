@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# ===========================================================================================
+#    LOGGER SETUP
+# ===========================================================================================
+
+import os, sys, logging
+
+
+sys.dont_write_bytecode = True
+
+
+# ===========================================================================================
+#  PATH HELPERS
+# ===========================================================================================
+
+# Dynamically resolve the directory where this script lives
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Main script path (not critical unless used externally)
+SCRIPT_PATH = os.path.join(SCRIPT_DIR, "squat_flix_importer.py")
+
+# Config path: env override or default to script-relative
+CONFIG_PATH = os.getenv("SQUATFLIX_CONFIG", os.path.join(SCRIPT_DIR, "json", "config.json"))
+
+# Log path: env override or default to script-relative
+LOG_PATH = os.getenv("SQUATFLIX_LOG", os.path.join(SCRIPT_DIR, "logs", "squatflix.log"))
+
+# ----------------------------------------------------------------------------- PATH HELPERS
+# ===========================================================================================
+
+
+class LogColors:
+    RESET   = "\033[0m"    # Reset to default terminal color
+    DEBUG   = "\033[36m"   # Cyan
+    INFO    = "\033[32m"   # Green
+    WARNING = "\033[33m"   # Yellow
+    ERROR   = "\033[31m"   # Red
+
+class ColorFormatter(logging.Formatter):
+    def format(self, record):
+        color = getattr(LogColors, record.levelname, LogColors.RESET)
+        message = super().format(record)
+        return f"{color}{message}{LogColors.RESET}"
+
+def setup_logger(level="DEBUG", log_path="logs/webhook.log"):
+    from pathlib import Path
+
+    # Ensure log directory exists
+    Path(log_path).parent.mkdir(exist_ok=True)
+
+    logger = logging.getLogger("SquatFlix")
+    logger.setLevel(logging.DEBUG)  # Always capture everything internally
+    logger.propagate = False        # Prevent double logging to root
+
+    # Clear existing handlers to avoid duplicates
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    # Formatters
+    plain_fmt = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s")
+    color_fmt = ColorFormatter("[%(asctime)s] [%(levelname)s] %(message)s")
+
+    # Console handler (respects requested level)
+    ch = logging.StreamHandler()
+    ch.setLevel(getattr(logging, level.upper(), logging.DEBUG))
+    ch.setFormatter(color_fmt)
+    logger.addHandler(ch)
+
+    # File handler (always logs everything)
+    fh = logging.FileHandler(log_path)
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(plain_fmt)
+    logger.addHandler(fh)
+
+    return logger

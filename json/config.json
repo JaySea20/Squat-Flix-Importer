@@ -1,0 +1,19 @@
+{
+  "autobrr": {
+    "host": "http://jaysea20.dione.bysh.me:14133",
+    "apikey": "3714478d3a9aa0f68dc4ef3946fdd28a"
+  },
+  "radarr": {
+    "host": "http://jaysea20.dione.bysh.me:10623",
+    "apikey": "9ee149e59353424f9b52c88c49db601a"
+  },
+  "qbittorrent": {
+    "host": "http://jaysea20.dione.bysh.me:14601",
+    "username": "jaysea20",
+    "password": "e4zf2t7rt5e"
+  },
+  "filters": {
+    "min_seeders": 5,
+    "quality": ["1080p", "2160p"]
+  }
+}

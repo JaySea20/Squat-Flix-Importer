@@ -1,0 +1,15 @@
+{
+  "radarr": {
+    "host": "localhost",
+    "apikey": "xyz789"
+  },
+  "qbittorrent": {
+    "host": "localhost",
+    "username": "user",
+    "password": "pass"
+  },
+  "filters": {
+    "min_seeders": 5,
+    "quality": "1080p"
+  }
+}

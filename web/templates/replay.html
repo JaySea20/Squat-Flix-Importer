@@ -1,0 +1,33 @@
+<!-- ============================================================
+     Squat-Flix Importer — Replay Page
+     Allows manual replay of saved webhook events
+     ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Replay Event — Squat-Flix</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Replay Webhook Event</h1>
+    <p>Select a saved Autobrr payload to manually replay:</p>
+
+    {% if files %}
+        <form method="post" action="/replay/trigger">
+            <label for="event_file">Event File:</label>
+            <select name="event_file" id="event_file">
+                {% for file in files %}
+                    <option value="{{ file }}">{{ file }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Replay</button>
+        </form>
+    {% else %}
+        <p>No saved events found in <code>json/</code>.</p>
+    {% endif %}
+
+    <p><a href="/">← Back to Dashboard</a></p>
+</body>
+</html>

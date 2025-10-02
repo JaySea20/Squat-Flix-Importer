@@ -1,0 +1,19 @@
+{
+  "autobrr": {
+    "host": "localhost",
+    "apikey": "abc123"
+  },
+  "radarr": {
+    "host": "localhost",
+    "apikey": "radarr456"
+  },
+  "qbittorrent": {
+    "host": "localhost",
+    "username": "user",
+    "password": "pass"
+  },
+  "filters": {
+    "min_seeders": 5,
+    "quality": "1080p"
+  }
+}

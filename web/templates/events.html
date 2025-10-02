@@ -1,0 +1,44 @@
+<!-- ============================================================
+     Squat-Flix Importer — Events Page
+     Shows recent Autobrr webhook payloads
+     ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webhook Events — Squat-Flix</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Webhook Events</h1>
+    <p>Recent payloads received from Autobrr:</p>
+
+    {% if events %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Release Name</th>
+                    <th>Indexer</th>
+                    <th>Filename</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.timestamp }}</td>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.indexer }}</td>
+                    <td><code>{{ event.filename }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No events found.</p>
+    {% endif %}
+
+    <p><a href="/">← Back to Dashboard</a></p>
+</body>
+</html>

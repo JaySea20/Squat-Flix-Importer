@@ -1,0 +1,25 @@
+<!-- ============================================================
+     Squat-Flix Importer — Config Page
+     Displays current config.json contents
+     ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Config — Squat-Flix</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Configuration</h1>
+    <p>Current settings loaded from <code>json/config.json</code>:</p>
+
+    {% if config %}
+        <pre>{{ config | tojson(indent=2) }}</pre>
+    {% else %}
+        <p><strong>Warning:</strong> Config file not found or unreadable.</p>
+    {% endif %}
+
+    <p><a href="/">← Back to Dashboard</a></p>
+</body>
+</html>

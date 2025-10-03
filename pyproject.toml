@@ -1,0 +1,11 @@
+# pyproject.toml style
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "httpx",
+    "requests",
+    "python-dotenv",
+    "dnspython",
+    "jinja2",
+    "pydantic"
+]

@@ -1,26 +1,53 @@
-<!-- ============================================================
-     Squat-Flix Importer — Dashboard
-     Entry point for viewing events, config, and replay tools
-     ============================================================ -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Squat-Flix Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Squat-Flix Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
+  <!-- Header -->
+  <header>
     <h1>Squat-Flix Importer</h1>
-    <p>Welcome to your webhook dashboard. Choose a section:</p>
+    <span class="status online">● Running</span>
+  </header>
 
-    <ul>
-        <li><a href="/events">📦 View Webhook Events</a></li>
-        <li><a href="/config">⚙️ View Config</a></li>
-        <li><a href="/replay">🔁 Replay Saved Event</a></li>
-    </ul>
+  <!-- Layout -->
+  <div class="layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li><a href="/events">📦 Events</a></li>
+          <li><a href="/config">⚙️ Config</a></li>
+          <li><a href="/replay">🔁 Replay</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-    <p>Status: <strong>Server is running</strong></p>
+    <!-- Main Content -->
+    <main class="content">
+      <h2>Dashboard</h2>
+      <p>Welcome to your webhook dashboard. Use the navigation to view events, config, or replay saved events.</p>
+    </main>
+  </div>
+
+  <!-- Live Logs -->
+  <section class="logs">
+    <h2>Live Logs</h2>
+    <pre id="log-console"></pre>
+  </section>
+
+  <!-- Script for log streaming -->
+  <script>
+    const logConsole = document.getElementById("log-console");
+    const evtSource = new EventSource("/logs/stream");
+    evtSource.onmessage = (e) => {
+      logConsole.textContent += e.data + "\n";
+      logConsole.scrollTop = logConsole.scrollHeight;
+    };
+  </script>
 </body>
 </html>

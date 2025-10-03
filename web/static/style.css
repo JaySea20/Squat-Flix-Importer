@@ -1,78 +1,77 @@
+/* Base */
 body {
-    font-family: monospace;
-    background-color: #111;
-    color: #eee;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f4f6f9;
+  color: #333;
 }
 
-header, footer {
-    background-color: #222;
-    padding: 1em;
-    text-align: center;
-    font-weight: bold;
-    border-bottom: 1px solid #444;
+/* Header */
+header {
+  background: #2d3e50;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header h1 {
+  margin: 0;
+}
+.status.online {
+  color: #4caf50;
+  font-weight: bold;
 }
 
-main {
-    padding: 2em;
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 60px);
 }
 
-h1, h2, h3 {
-    color: #ffcc00;
-    margin-top: 0;
+/* Sidebar */
+.sidebar {
+  background: #fff;
+  padding: 1rem;
+  border-right: 1px solid #ddd;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.sidebar li {
+  margin: 0.75rem 0;
+}
+.sidebar a {
+  text-decoration: none;
+  color: #2d3e50;
+  font-weight: 500;
+}
+.sidebar a:hover {
+  color: #0078d7;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1em;
+/* Content */
+.content {
+  padding: 2rem;
 }
 
-th, td {
-    border: 1px solid #444;
-    padding: 0.5em;
-    text-align: left;
+/* Logs */
+.logs {
+  background: #1e1e1e;
+  color: #0f0;
+  font-family: monospace;
+  padding: 1rem;
+  height: 250px;
+  overflow-y: auto;
+  border-top: 2px solid #333;
 }
-
-th {
-    background-color: #333;
-    color: #fff;
+.logs h2 {
+  color: #fff;
+  margin-top: 0;
 }
-
-tr:nth-child(even) {
-    background-color: #1a1a1a;
-}
-
-a {
-    color: #66ccff;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-form {
-    margin-top: 2em;
-}
-
-input[type="text"], select {
-    background-color: #222;
-    color: #eee;
-    border: 1px solid #555;
-    padding: 0.5em;
-    width: 100%;
-}
-
-input[type="submit"] {
-    background-color: #444;
-    color: #fff;
-    border: none;
-    padding: 0.5em 1em;
-    cursor: pointer;
-}
-
-input[type="submit"]:hover {
-    background-color: #666;
+#log-console {
+  margin: 0;
+  white-space: pre-wrap;
 }

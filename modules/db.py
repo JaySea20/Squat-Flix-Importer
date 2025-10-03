@@ -13,7 +13,8 @@ __version__ = "v0.0.5-beta"
 import sqlite3
 import os
 import json
-from modules.Jaylog import mklog
+import modules.Jaylog
+import modules.json
 
 # ============================== Constants ====================================
 
@@ -21,7 +22,8 @@ DB_PATH = os.getenv("SQLITE_DB_PATH", "./logs/squatflix.db")
 
 # ============================== Logging ====================================
 
-logger = mklog(__name__, level="DEBUG", log_path="./../logs/db.log")
+logger = mklog(name="sqlite", level="DEBUG", logfile="/home/joshua/scripts/squat_flix_importer/logs/db.log")
+logger.debug(f"Using SQLite DB path: {DB_PATH}")
 
 # ============================== Initialize ====================================
 
@@ -63,7 +65,7 @@ def store_json(source: str, payload: dict):
 
 # ============================== Fetch ====================================
 
-def fetch_json(limit: int = 100) -> list:
+def fetch_json(limit: int = 250) -> list:
     logger.debug(f"Fetching up to {limit} recent payloads from database")
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
@@ -72,4 +74,7 @@ def fetch_json(limit: int = 100) -> list:
     logger.debug(f"Fetched {len(rows)} payloads")
     return [json.loads(row[0]) for row in rows]
 
+# ====== Nothing to see here =========================
 
+def get_db_path() -> str:
+    return DB_PATH

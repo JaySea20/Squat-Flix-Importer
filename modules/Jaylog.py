@@ -5,8 +5,7 @@ __version__ = "v0.1.0-beta"
 
 import logging
 from pathlib import Path
-from colorama import Fore, Style, init
-
+import colorama
 init(autoreset=True)
 
 class ColorFormatter(logging.Formatter):

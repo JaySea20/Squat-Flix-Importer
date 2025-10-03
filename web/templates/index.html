@@ -35,19 +35,19 @@
   </div>
 
   <!-- Live Logs -->
-  <section class="logs">
-    <h2>Live Logs</h2>
-    <pre id="log-console"></pre>
-  </section>
+<div id="log-terminal" style="background:#000;color:#0f0;padding:1em;font-family:monospace;height:400px;overflow-y:auto;"></div>
 
-  <!-- Script for log streaming -->
-  <script>
-    const logConsole = document.getElementById("log-console");
-    const evtSource = new EventSource("/logs/stream");
-    evtSource.onmessage = (e) => {
-      logConsole.textContent += e.data + "\n";
-      logConsole.scrollTop = logConsole.scrollHeight;
-    };
+<script>
+const logDiv = document.getElementById("log-terminal");
+const socket = new WebSocket("ws://10.0.30.10:9090/ws/logs");
+
+socket.onmessage = (event) => {
+    const line = document.createElement("div");
+    line.textContent = event.data;
+    logDiv.appendChild(line);
+    logDiv.scrollTop = logDiv.scrollHeight;
+};
+</script>
   </script>
 </body>
 </html>

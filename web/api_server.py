@@ -6,14 +6,15 @@
 __version__ = "v0.6.5-beta"
 
 #from pathlib import Path
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+#from fastapi import FastAPI, Request, Form
+#from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse, StreamingResponse
+#from fastapi.staticfiles import StaticFiles
+#from fastapi.templating import Jinja2Templates
+import fastapi
 from pydantic import BaseModel
 from typing import List, Optional
-from modules.logger import setup_logger
-from modules.autobrr import acceptPayload
+import modules.Jaylog
+import modules.autobrr
 import sys
 import subprocess
 import logging
@@ -31,19 +32,6 @@ app = FastAPI()
 #  PATH HELPERS
 # ===========================================================================================
 
-# Dynamically resolve the directory where this script lives
-#SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Main script path (not critical unless used externally)
-#SCRIPT_PATH = os.path.join(SCRIPT_DIR, "squat_flix_importer.py")
-
-# Config path: env override or default to script-relative
-#CONFIG_PATH = os.getenv("SQUATFLIX_CONFIG", os.path.join(SCRIPT_DIR, "json", "config.json"))
-
-# Log path: env override or default to script-relative
-#LOG_PATH = os.getenv("SQUATFLIX_LOG", os.path.join(SCRIPT_DIR, "logs", "squatflix.log"))
-
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
@@ -57,7 +45,6 @@ LOG_PATH = os.getenv("SQUATFLIX_LOG", os.path.join(LOG_DIR, "squatflix.log"))
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
 
 
 # --------------------------------------------------------------- PATH HELPERS
@@ -96,19 +83,6 @@ uvicorn_error.addHandler(queue_handler)
 #   FastAPI Setup
 # ------------------------------------------------------------
 
-#app = FastAPI()
-#templates = Jinja2Templates(directory="web/templates")
-#app.mount("web/static", StaticFiles(directory="web/static"), name="static")
-
-#app = FastAPI()
-
-#TEMPLATES_DIR = os.path.join(SCRIPT_DIR, "templates")
-#STATIC_DIR = os.path.join(SCRIPT_DIR, "static")
-#JSON_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "json")
-
-
-#templates = Jinja2Templates(directory=TEMPLATES_DIR)
-#app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # ------------------------------------------------------------
@@ -191,7 +165,9 @@ class AutoBRRPayload(BaseModel):
 
 @app.post("/webhook/autobrr")
 async def autobrr_webhook(payload: AutoBRRPayload):
-    result = acceptPayload(payload.dict())
+    result = acceptPayload(payload)
+    logger.info(f"DATA has arrived VIA Autobrr API")
+    logger.info(f"It has been handed off to autobrr.py")
     return {
         "status": result.get("status", "error"),
         "title": payload.Title,
@@ -199,12 +175,27 @@ async def autobrr_webhook(payload: AutoBRRPayload):
     }
 
 # ------------------------------------------------------------
-#   Web Log Console
+#   WebSocket Log Streaming
 # ------------------------------------------------------------
 
-#from fastapi import FastAPI
-#from fastapi.responses import StreamingResponse
 
+#from fastapi import WebSocket
+#from modules.logging import log_queue
+
+@app.websocket("/ws/logs")
+async def stream_logs(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            line = await log_queue.get()
+            await websocket.send_text(line)
+    except Exception:
+        await websocket.close()
+
+
+# ------------------------------------------------------------
+#   Web Log Console
+# ------------------------------------------------------------
 
 @app.get("/logs/stream")
 async def stream_logs():
@@ -213,7 +204,6 @@ async def stream_logs():
             line = await log_queue.get()
             yield f"data: {line}\n\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
-
 
 # ------------------------------------------------------------
 #   Index
@@ -235,10 +225,6 @@ def events(request: Request):
             if fname.startswith("autobrr_event_") and fname.endswith(".json"):
                 with open(os.path.join(JSON_DIR, fname)) as f:
                     data = json.load(f)
-#        for fname in sorted(os.listdir(JSON_DIR), reverse=True):
-#            if fname.startswith("autobrr_event_") and fname.endswith(".json"):
-#                with open(os.path.join(JSON_DIR, fname)) as f:
-#                    data = json.load(f)
                     event_list.append({
                         "filename": fname,
                         "title": data.get("releaseName", "Unknown"),
@@ -266,69 +252,6 @@ def config_view(request: Request):
 
     return templates.TemplateResponse("config.html", {"request": request, "config": config_data})
 
-
-
-# ------------------------------------------------------------
-#   Replay
-# ------------------------------------------------------------
-
-'''
-@app.get("/replay", response_class=HTMLResponse)
-def replay_view(request: Request):
-    try:
-        files = [f for f in os.listdir(JSON_DIR) if f.startswith("autobrr_event_")]
-    except Exception as e:
-        ApiLogger.warning(f"Failed to list replay files: {e}")
-        files = []
-
-    return templates.TemplateResponse("replay.html", {"request": request, "files": files})
-
-
-# ------------------------------------------------------------
-#   Replay Trigger
-# ------------------------------------------------------------
-
-
-@app.post("/replay/trigger")
-def replay_trigger(request: Request, event_file: str = Form(...)):
-    start = time.time()
-    ApiLogger.info(f"Replay triggered for {event_file}")
-
-    json_path = os.path.join(JSON_DIR, event_file)
-    if not os.path.exists(json_path):
-        ApiLogger.error(f"Replay file not found: {json_path}")
-        return templates.TemplateResponse("replay.html", {
-            "request": request,
-            "files": [],
-            "error": f"File not found: {event_file}"
-        })
-
-    try:
-        result = subprocess.run([
-            "python3", "squat_flix_importer.py",
-            "--json", json_path,
-            "--loglevel", "INFO"
-        ], capture_output=True, text=True, timeout=30)
-
-        output = result.stdout.strip() + "\n" + result.stderr.strip()
-        status = "success" if result.returncode == 0 else "error"
-        ApiLogger.info(f"Replay completed with status: {status}")
-
-    except Exception as e:
-        output = f"Exception during replay: {e}"
-        status = "error"
-        ApiLogger.exception("Replay failed")
-
-    elapsed = time.time() - start
-    return templates.TemplateResponse("replay.html", {
-        "request": request,
-        "files": os.listdir("json"),
-        "output": output,
-        "status": status,
-        "elapsed": f"{elapsed:.2f}s"
-    })
-
-'''
 #===================================================================
 #      API-Call
 #===================================================================

@@ -10,12 +10,14 @@
 __version__ = "v0.1.0-beta"
 
 # ============================== Imports ======================================
-import os, json, requests, dns.resolver
-from modules.logger import setup_logger
-from modules.db import store_json
-from dotenv import load_dotenv
+import os
+import json
+import request
+import dns.resolver
+import modules.Jaylog
+import modules.db
 from pydantic import BaseModel
-from typing import Optional
+#from typing import Optional
 
 # ============================== Globals ======================================
 
@@ -73,19 +75,6 @@ def acceptPayload(payload: dict) -> dict:
     return {"status": "accepted"}
 
 
-
-
-#def validateJSON(payload: dict):
-#    """
-#    Minimal validation for complete Autobrr data.
-#    This is NOT meant to be useable with any other JSON objects. 
-#    We are trying to be specific to autobrr api json here
-#    type checks
-#    null checks
-#    scope checks ( is there a year that is 0? That cant be right)
-#    """
-#    return the full json object
-
 def logJSON(payload: dict):
     """
     Log the JSON object to console or file or both.
@@ -116,80 +105,3 @@ def keyGroup():
     return {True}
 
 
-# ============================== Schema =======================================
-
-# This still needs alot of work to get it into a JSON object that can be worked with out JSON functions
-'''
-class autobrrData(BaseModel):
-    Artists: Optional[str]
-    Audio: Optional[List[str]]
-    AudioChannels: Optional[str]
-    AudioFormat: Optional[str]
-    Bitrate: Optional[str]
-    Bonus: Optional[List[str]]
-    Categories: Optional[List[str]]
-    Category: Optional[str]
-    Codec: Optional[List[str]]
-    Container: Optional[str]
-    CurrentDay: Optional[int]
-    CurrentHour: Optional[int]
-    CurrentMinute: Optional[int]
-    CurrentMonth: Optional[int]
-    CurrentSecond: Optional[int]
-    CurrentYear: Optional[int]
-    Day: Optional[int]
-    Description: Optional[str]
-    DownloadURL: Optional[str]
-    Episode: Optional[int]
-    FilterID: Optional[int]
-    FilterName: Optional[str]
-    Freeleech: Optional[bool]
-    FreeleechPercent: Optional[int]
-    Group: Optional[str]
-    GroupID: Optional[str]
-    HasCue: Optional[bool]
-    HasLog: Optional[bool]
-    HDR: Optional[str]
-    Implementation: Optional[str]
-    Indexer: Optional[str]
-    IndexerIdentifier: Optional[str]
-    IndexerIdentifierExternal: Optional[str]
-    IndexerName: Optional[str]
-    InfoUrl: Optional[str]
-    IsDuplicate: Optional[bool]
-    Language: Optional[List[str]]
-    Leechers: Optional[int]
-    LogScore: Optional[int]
-    MagnetURI: Optional[str]
-    MetaIMDB: Optional[str]
-    Month: Optional[int]
-    Origin: Optional[str]
-    Other: Optional[List[str]]
-    PreTime: Optional[str]
-    Proper: Optional[bool]
-    Protocol: Optional[str]
-    RecordLabel: Optional[str]
-    Region: Optional[str]
-    Repack: Optional[bool]
-    Resolution: Optional[str]
-    Season: Optional[int]
-    Seeders: Optional[int]
-    Size: Optional[int]
-    SizeString: Optional[str]
-    SkipDuplicateProfileID: Optional[int]
-    SkipDuplicateProfileName: Optional[str]
-    Source: Optional[str]
-    Tags: Optional[str]
-    Title: Optional[str]
-    TorrentDataRawBytes: Optional[str]
-    TorrentHash: Optional[str]
-    TorrentID: Optional[str]
-    TorrentName: Optional[str]
-    TorrentPathName: Optional[str]
-    TorrentTmpFile: Optional[str]
-    TorrentUrl: Optional[str]
-    Type: Optional[str]
-    Uploader: Optional[str]
-    Website: Optional[str]
-    Year: Optional[int]
-'''

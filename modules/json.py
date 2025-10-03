@@ -12,7 +12,7 @@ import json
 import httpx
 import os
 from typing import Any
-from modules.Jaylog import mklog
+import modules.Jaylog
 # ============================== Logger =======================================
 
 logger = mklog(__name__, level="DEBUG", logfile="../logs/json.log")

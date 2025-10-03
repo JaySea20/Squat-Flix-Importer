@@ -7,6 +7,8 @@
 # Created: 2025-10-02
 # =============================================================================
 
+__version__ = "v0.1.0-beta"
+
 # ============================== Imports ======================================
 import os, json, requests, dns.resolver
 from modules.logger import setup_logger

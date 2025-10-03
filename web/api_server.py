@@ -3,6 +3,8 @@
 #   Squat-Flix Webhook Listener for Autobrr
 # ============================================================
 
+__version__ = "v0.6.5-beta"
+
 #from pathlib import Path
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse, StreamingResponse
